@@ -14,7 +14,7 @@ namespace MichiruLite.Services
         }
         private async Task send(SocketMessage msg)
         {
-            Console.WriteLine("asd");
+            Console.WriteLine($"{msg.Content}");
         }
     }
 }
