@@ -1,27 +1,31 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MichiruLite.Services
 {
-    class AuthorizationService
+    internal class AuthorizationService
     {
+        private const string tokenPath = "D://discordToken.txt";
 
-		public AuthorizationService(DiscordSocketClient client, MessageService service)
-		{
-
-			client.LoginAsync(TokenType.Bot, "NzQwMjg4MTYzODY3Nzg3MzY1.Xym1FA.-vBdoUNW1s-hu56UcX8IZfHPKgI").GetAwaiter().GetResult();
-			client.StartAsync().GetAwaiter().GetResult();
-			client.Ready += () =>
-			{
-				Console.WriteLine("Bot is connected!");
-				return Task.CompletedTask;
-			};
-		}
-	}
+        public AuthorizationService(DiscordSocketClient client)
+        {
+            try
+            {
+                client.LoginAsync(TokenType.Bot, File.ReadAllLines(tokenPath).First()).GetAwaiter().GetResult();
+                client.StartAsync().GetAwaiter().GetResult();
+                client.Ready += () =>
+                {
+                    return Task.CompletedTask;
+                };
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine($"Token file not founded [{tokenPath}]: {ex}");
+            }
+        }
+    }
 }

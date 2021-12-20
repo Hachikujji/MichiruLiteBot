@@ -4,14 +4,28 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 
 namespace MichiruLite
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
-            => new Michiru().StartAsync().GetAwaiter().GetResult();
+        private static void Main(string[] args)
+        {
+            try
+            {
+                new Michiru().StartAsync().GetAwaiter().GetResult();
+            }
+            catch (FileNotFoundException e)
+            {
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
     }
 }

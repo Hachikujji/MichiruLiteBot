@@ -1,29 +1,25 @@
 ﻿using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using MichiruLite.Modules.Audio;
+using MichiruLite.Modules.Audio.Services;
 using MichiruLite.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MichiruLite
 {
-    class Michiru
+    internal class Michiru
     {
         private static IServiceProvider _serviceProvider;
+
         private static void ConfigureServices()
         {
             var serviceCollection = new ServiceCollection();
             // Subscribe Services
-            serviceCollection.AddSingleton<CommandHandler>();
-            serviceCollection.AddSingleton<AudioService>();
-            serviceCollection.AddSingleton<MessageService>();
             serviceCollection.AddSingleton<DiscordSocketClient>();
-            serviceCollection.AddSingleton<AuthorizationService>();
             serviceCollection.AddSingleton(new CommandService(new CommandServiceConfig
             {
                 DefaultRunMode = RunMode.Async,
@@ -31,8 +27,14 @@ namespace MichiruLite
                 CaseSensitiveCommands = false,
                 ThrowOnError = false
             }));
-            serviceCollection.AddLogging(configure => configure.AddConsole());
-
+            serviceCollection.AddSingleton<CommandHandler>();
+            serviceCollection.AddSingleton<AudioService>();
+            serviceCollection.AddSingleton<LogService>();
+            serviceCollection.AddSingleton<AuthorizationService>();
+            serviceCollection.AddSingleton<AudioModule>();
+            serviceCollection.AddSingleton<InteractiveService>();
+            serviceCollection.AddSingleton<YoutubeService>();
+            //serviceCollection.AddScoped<QueueService>();
             _serviceProvider = serviceCollection.BuildServiceProvider();
         }
 
@@ -40,13 +42,13 @@ namespace MichiruLite
         {
             ConfigureServices();
 
-            _serviceProvider.GetRequiredService<AuthorizationService>();
+            _serviceProvider.GetRequiredService<DiscordSocketClient>();
+            _serviceProvider.GetRequiredService<LogService>();
+            _serviceProvider.GetRequiredService<AudioModule>();
             _serviceProvider.GetRequiredService<CommandHandler>();
-
+            _serviceProvider.GetRequiredService<AuthorizationService>();
 
             await Task.Delay(-1);
-
         }
-
     }
 }
